@@ -99,12 +99,14 @@ public partial class WS_Network
 
                     while (Packets.TryDequeue(out var packet))
                     {
-                        using (packet)
+                        var tempPacket = packet;
+
+                        using (tempPacket)
                         {
-                            if (!WorldServiceLocator.WorldServer.PacketHandlers.ContainsKey(packet.OpCode))
+                            if (!WorldServiceLocator.WorldServer.PacketHandlers.ContainsKey(tempPacket.OpCode))
                             {
-                                WorldServiceLocator.WorldServer.Log.WriteLine(LogType.WARNING, $"[{IP}:{Port}] Unknown Opcode 0x{(int)packet.OpCode:X2} [DataLen={packet.Data.Length} {packet.OpCode}]");
-                                DumpPacket(packet);
+                                WorldServiceLocator.WorldServer.Log.WriteLine(LogType.WARNING, $"[{IP}:{Port}] Unknown Opcode 0x{(int)tempPacket.OpCode:X2} [DataLen={tempPacket.Data.Length} {tempPacket.OpCode}]");
+                                DumpPacket(tempPacket);
                             }
                             else
                             {
@@ -113,19 +115,19 @@ public partial class WS_Network
                                 {
                                     try
                                     {
-                                        var handlePacket = WorldServiceLocator.WorldServer.PacketHandlers[packet.OpCode];
+                                        var handlePacket = WorldServiceLocator.WorldServer.PacketHandlers[tempPacket.OpCode];
                                         var client = this;
                                         handlePacket(ref packet, ref client);
 
                                         if (WorldServiceLocator.NativeMethods.timeGetTime("") - start > 100)
                                         {
-                                            WorldServiceLocator.WorldServer.Log.WriteLine(LogType.WARNING, "Packet processing took too long: {0}, {1}ms", packet.OpCode, WorldServiceLocator.NativeMethods.timeGetTime("") - start);
+                                            WorldServiceLocator.WorldServer.Log.WriteLine(LogType.WARNING, "Packet processing took too long: {0}, {1}ms", tempPacket.OpCode, WorldServiceLocator.NativeMethods.timeGetTime("") - start);
                                         }
                                     }
                                     catch (Exception ex3)
                                     {
-                                        DumpPacket(packet);
-                                        SetError(ex3, $"Opcode handler {packet?.OpCode}:{packet?.OpCode} caused an error: {ex3.Message}{Environment.NewLine}", LogType.FAILED);
+                                        DumpPacket(tempPacket);
+                                        SetError(ex3, $"Opcode handler {tempPacket?.OpCode}:{tempPacket?.OpCode} caused an error: {ex3.Message}{Environment.NewLine}", LogType.FAILED);
                                         SetError(ex3, $"Connection from [{IP}:{Port}] cause error {ex3.Message}{Environment.NewLine}", LogType.FAILED);
                                         Delete();
                                     }

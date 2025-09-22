@@ -26,7 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
@@ -172,8 +171,6 @@ public partial class WS_Warden
 
         private int dwModuleSize;
 
-        private int dwLibraryCount;
-
         private CHeader Header;
 
         private SendPacketDelegate SendPacketD;
@@ -192,19 +189,13 @@ public partial class WS_Warden
 
         private GenerateRC4KeysDelegate GenerateRC4Keys;
 
-        private UnloadModuleDelegate UnloadModule;
-
         private PacketHandlerDelegate PacketHandler;
-
-        private TickDelegate Tick;
 
         private int m_Mod;
 
         private readonly int m_ModMem;
 
         private int InitPointer;
-
-        private InitializeModule init;
 
         private IntPtr myFuncList;
 
@@ -217,20 +208,6 @@ public partial class WS_Warden
         private WardenFuncList myWardenList;
 
         private int pWardenList;
-
-        private GCHandle gchSendPacket;
-
-        private GCHandle gchCheckModule;
-
-        private GCHandle gchModuleLoad;
-
-        private GCHandle gchAllocateMem;
-
-        private GCHandle gchReleaseMem;
-
-        private GCHandle gchSetRC4Data;
-
-        private GCHandle gchGetRC4Data;
 
         private int m_RC4;
 
@@ -249,7 +226,6 @@ public partial class WS_Warden
             Script = null;
             delegateCache = new Dictionary<string, Delegate>();
             dwModuleSize = 0;
-            dwLibraryCount = 0;
             SendPacketD = null;
             CheckModuleD = null;
             ModuleLoadD = null;
@@ -258,13 +234,10 @@ public partial class WS_Warden
             SetRC4DataD = null;
             GetRC4DataD = null;
             GenerateRC4Keys = null;
-            UnloadModule = null;
             PacketHandler = null;
-            Tick = null;
             m_Mod = 0;
             m_ModMem = 0;
             InitPointer = 0;
-            init = null;
             myFuncList = IntPtr.Zero;
             myFunctionList = default;
             pFuncList = 0;
@@ -762,8 +735,8 @@ public partial class WS_Warden
                                         dwImports += 4;
                                     }
                                 }
+
                                 dwLibraryIndex++;
-                                dwLibraryCount++;
                             }
                             for (var dwIndex = 0; dwIndex < Header.dwChunkCount; dwIndex++)
                             {
@@ -858,7 +831,6 @@ public partial class WS_Warden
                 try
                 {
                     WorldServiceLocator.WorldServer.Log.WriteLine(LogType.SUCCESS, "[WARDEN] Successfully Initialized Module.");
-                    init = (InitializeModule)Marshal.GetDelegateForFunctionPointer(new IntPtr(InitPointer), typeof(InitializeModule));
                 }
                 catch (Exception ex2)
                 {
@@ -876,9 +848,7 @@ public partial class WS_Warden
                 Console.WriteLine("  PacketHandler: 0x{0:X}", myWardenList.fpPacketHandler);
                 Console.WriteLine("  Tick: 0x{0:X}", myWardenList.fpTick);
                 GenerateRC4Keys = (GenerateRC4KeysDelegate)Marshal.GetDelegateForFunctionPointer(new IntPtr(myWardenList.fpGenerateRC4Keys), typeof(GenerateRC4KeysDelegate));
-                UnloadModule = (UnloadModuleDelegate)Marshal.GetDelegateForFunctionPointer(new IntPtr(myWardenList.fpUnload), typeof(UnloadModuleDelegate));
                 PacketHandler = (PacketHandlerDelegate)Marshal.GetDelegateForFunctionPointer(new IntPtr(myWardenList.fpPacketHandler), typeof(PacketHandlerDelegate));
-                Tick = (TickDelegate)Marshal.GetDelegateForFunctionPointer(new IntPtr(myWardenList.fpTick), typeof(TickDelegate));
                 return true;
             }
         }

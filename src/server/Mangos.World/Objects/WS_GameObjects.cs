@@ -23,10 +23,8 @@ using Mangos.Common.Globals;
 using Mangos.Common.Legacy;
 using Mangos.World.Globals;
 using Mangos.World.Loots;
-using Mangos.World.Maps;
 using Mangos.World.Network;
 using Mangos.World.Player;
-using Mangos.World.Quests;
 using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
@@ -58,8 +56,6 @@ public class WS_GameObjects
 
         public string ScriptName;
 
-        private readonly bool found_;
-
         private bool _disposedValue;
 
         public GameObjectInfo(int ID_)
@@ -73,7 +69,6 @@ public class WS_GameObjects
             Size = 1f;
             Fields = new uint[24];
             ScriptName = "";
-            found_ = false;
             ID = ID_;
             WorldServiceLocator.WorldServer.GAMEOBJECTSDatabase.Add(ID, this);
             DataTable MySQLQuery = new();
@@ -81,10 +76,8 @@ public class WS_GameObjects
             if (MySQLQuery.Rows.Count == 0)
             {
                 WorldServiceLocator.WorldServer.Log.WriteLine(LogType.FAILED, "gameobject_template {0} not found in SQL database!", ID_);
-                found_ = false;
                 return;
             }
-            found_ = true;
             Model = MySQLQuery.Rows[0].As<int>("displayId");
             Type = (GameObjectType)MySQLQuery.Rows[0].As<byte>("type");
             Name = MySQLQuery.Rows[0].As<string>("name");
