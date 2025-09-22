@@ -201,7 +201,7 @@ public class WcHandlersAuth
                 addOnsEnable.AddInt8(1);                    // Unk
                 FileStream fs = new(string.Format(@"interface\{0}.pub", addOnsNames[i]), FileMode.Open, FileAccess.Read, FileShare.Read, 258, FileOptions.SequentialScan);
                 var fb = new byte[257];
-                fs.Read(fb, 0, 257);
+                fs.ReadExactly(fb, 0, 257);
 
                 // NOTE: Read from file
                 addOnsEnable.AddByteArray(fb);

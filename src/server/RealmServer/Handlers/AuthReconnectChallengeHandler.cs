@@ -16,7 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-using Mangos.Realm.Network.Handlers;
 using RealmServer.Network;
 using RealmServer.Requests;
 using RealmServer.Responses;

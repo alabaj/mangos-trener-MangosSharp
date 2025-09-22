@@ -20,14 +20,13 @@ using Mangos.Logging;
 using Mangos.MySql.GetAccountInfo;
 using Mangos.MySql.IsBannedAccount;
 using RealmServer.Domain;
-using RealmServer.Handlers;
 using RealmServer.Network;
 using RealmServer.Requests;
 using RealmServer.Responses;
 using System.Globalization;
 using System.Text;
 
-namespace Mangos.Realm.Network.Handlers;
+namespace RealmServer.Handlers;
 
 internal sealed class RsLogonChallengeHandler : IHandler<RsLogonChallengeRequest>
 {

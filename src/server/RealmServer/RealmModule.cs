@@ -17,7 +17,6 @@
 //
 
 using Autofac;
-using Mangos.Realm.Network.Handlers;
 using Mangos.Tcp;
 using RealmServer.Domain;
 using RealmServer.Handlers;
