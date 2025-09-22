@@ -16,29 +16,30 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-using Autofac;
 using Mangos.MySql.GetAccountInfo;
 using Mangos.MySql.GetRealmList;
 using Mangos.MySql.IsBannedAccount;
 using Mangos.MySql.UpdateAccount;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Mangos.MySql;
-
-public sealed class MySqlModule : Module
+namespace Mangos.MySql.DependencyInjection;
+public static class DependencyInjection
 {
-    protected override void Load(ContainerBuilder builder)
+    public static IServiceCollection AddDatabase(this IServiceCollection services)
     {
-        builder.RegisterType<ConnectionFactory>().SingleInstance();
-        builder.Register(context => context.Resolve<ConnectionFactory>().ConnectToAccountDataBase()).SingleInstance();
+        services.AddSingleton<ConnectionFactory>();
 
-        RegisterQueries(builder);
-    }
+        services.AddSingleton(provider =>
+        {
+            var factory = provider.GetRequiredService<ConnectionFactory>();
+            return factory.ConnectToAccountDataBase();
+        });
 
-    private void RegisterQueries(ContainerBuilder builder)
-    {
-        builder.RegisterType<GetAccountInfoQuery>().As<IGetAccountInfoQuery>().SingleInstance();
-        builder.RegisterType<IsBannedAccountQuery>().As<IIsBannedAccountQuery>().SingleInstance();
-        builder.RegisterType<UpdateAccountCommand>().As<IUpdateAccountCommand>().SingleInstance();
-        builder.RegisterType<GetRealmListQuery>().As<IGetRealmListQuery>().SingleInstance();
+        services.AddSingleton<IGetAccountInfoQuery, GetAccountInfoQuery>();
+        services.AddSingleton<IIsBannedAccountQuery, IsBannedAccountQuery>();
+        services.AddSingleton<IUpdateAccountCommand, UpdateAccountCommand>();
+        services.AddSingleton<IGetRealmListQuery, GetRealmListQuery>();
+
+        return services;
     }
 }
