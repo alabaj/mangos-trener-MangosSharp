@@ -16,28 +16,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 
-using Autofac;
-using GameServer.Handlers;
-using GameServer.Network;
-using GameServer.Requests;
-using GameServer.Services;
-using Mangos.Tcp;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace GameServer;
-
-internal sealed class GameModule : Module
+namespace Mangos.Logging.DependencyInjection;
+public static class DependencyInjection
 {
-    protected override void Load(ContainerBuilder builder)
+    public static IServiceCollection AddMangosLogger(this IServiceCollection services)
     {
-        builder.RegisterType<GameTcpConnection>().As<ITcpConnection>().InstancePerLifetimeScope();
-        builder.RegisterType<GameState>().As<IGameState>().InstancePerLifetimeScope();
+        services.AddSingleton<IMangosLogger, MangosLogger>();
 
-        RegisterHandlers(builder);
-    }
-
-    private void RegisterHandlers(ContainerBuilder builder)
-    {
-        builder.RegisterType<CMSG_PING_Handler>().InstancePerLifetimeScope();
-        builder.RegisterType<HandlerDispatcher<CMSG_PING, CMSG_PING_Handler>>().As<IHandlerDispatcher>().InstancePerLifetimeScope();
+        return services;
     }
 }
